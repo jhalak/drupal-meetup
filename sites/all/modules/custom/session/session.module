@@ -1,0 +1,35 @@
+<?php
+/**
+ * @file
+ * Code for the Session feature.
+ */
+
+include_once 'session.features.inc';
+
+function session_menu(){
+  return array(
+    'sessions' => array(
+      'title' => t('Sessions'),
+      'page callback' => 'session_list',
+      'access arguments' => array('access content'),
+    )
+  );
+}
+
+function session_list(){
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'session');
+  $result = $query->execute();
+  if (empty($result['node'])) {
+    return t('No entry found.');
+  }
+  $nodes = array_keys($result['node']);
+  return node_view_multiple(node_load_multiple($nodes));
+}
+
+function dump($var){
+  echo '<pre>';
+  print_r($var);
+  exit;
+}
