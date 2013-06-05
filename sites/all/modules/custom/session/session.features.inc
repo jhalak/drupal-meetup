@@ -5,6 +5,13 @@
  */
 
 /**
+ * Implements hook_views_api().
+ */
+function session_views_api() {
+  return array("api" => "3.0");
+}
+
+/**
  * Implements hook_node_info().
  */
 function session_node_info() {
