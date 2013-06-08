@@ -19,7 +19,8 @@ function session_menu(){
 function session_list(){
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'session');
+        ->entityCondition('bundle', array('session'))
+        ->fieldCondition('field_speaker', 'value', 'Jhalak', '=');
   $result = $query->execute();
   if (empty($result['node'])) {
     return t('No entry found.');
