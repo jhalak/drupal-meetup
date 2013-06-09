@@ -1,0 +1,7 @@
+name = EntityFieldQuery
+description = EntityFieldQuery example module
+core = 7.x
+package = meetup
+php = 5.2.4
+version = 7.x-1.0
+project = session
