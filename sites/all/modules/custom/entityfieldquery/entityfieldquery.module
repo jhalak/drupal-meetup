@@ -3,6 +3,8 @@
  * @author - Jhalak
  */
 
+require_once 'NodeSessionQuery.inc';
+
 function entityfieldquery_menu(){
   return array(
     'sessions' => array(
@@ -13,17 +15,13 @@ function entityfieldquery_menu(){
   );
 }
 
+/**
+ * callback function
+ */
 function entityfieldquery_list(){
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', array('session'))
-    ->fieldCondition('field_speaker', 'value', 'Jhalak', '=');
-  $result = $query->execute();
-  if (empty($result['node'])) {
-    return t('No entry found.');
-  }
-  $nodes = array_keys($result['node']);
-  return node_view_multiple(node_load_multiple($nodes));
+  entityfieldquery_list_with_db_select();
+  entityfieldquery_list_normal();
+  entityfieldquery_list_extends();
 }
 
 function entityfieldquery_list_with_db_select(){
@@ -41,6 +39,35 @@ function entityfieldquery_list_with_db_select(){
   while($record = $result->fetchAssoc()) {
     $nodes[] = $record['nid'];
   }
+  return _entityfieldquery_generate_teasure_view($nodes);
+}
+
+function entityfieldquery_list_normal() {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', array('session'))
+    ->fieldCondition('field_speaker', 'value', 'Jhalak', '=');
+  $result = $query->execute();
+  return _entityfieldquery_generate_output_from_result($result);
+}
+
+
+function entityfieldquery_list_extends() {
+  $query = new NodeSessionQuery();
+  $query->fieldCondition('field_speaker', 'value', 'Jhalak', '=');
+  $result = $query->execute();
+  return _entityfieldquery_generate_output_from_result($result);
+}
+
+function _entityfieldquery_generate_output_from_result($result) {
+  if (empty($result['node'])) {
+    return t('No entry found.');
+  }
+  $nodes = array_keys($result['node']);
+  return _entityfieldquery_generate_teasure_view($nodes);
+}
+
+function _entityfieldquery_generate_teasure_view($nodes) {
   return node_view_multiple(node_load_multiple($nodes));
 }
 
