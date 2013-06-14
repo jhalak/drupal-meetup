@@ -14,6 +14,7 @@ dump:
 	@echo "Done"
 load:
 	@echo "Loading from db.sql ....."
+	drush sql-drop -y
 	drush sqlc < db.sql
 dump-basic:
 	@echo "clearing cache ....."
@@ -23,6 +24,7 @@ dump-basic:
 	@echo "Done"
 load-basic:
 	@echo "Loading from db-basic.sql ....."
+	drush sql-drop -y
 	drush sqlc < db-basic.sql
 revert-all-components:
 	drush features-revert-all
