@@ -1,0 +1,17 @@
+name = Session
+description = Session module
+core = 7.x
+package = meetup
+php = 5.2.4
+version = 7.x-1.0
+project = session
+dependencies[] = features
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[field_base][] = body
+features[field_base][] = field_speaker
+features[field_instance][] = node-session-body
+features[field_instance][] = node-session-field_speaker
+features[node][] = session
+features[views_view][] = manage_session
