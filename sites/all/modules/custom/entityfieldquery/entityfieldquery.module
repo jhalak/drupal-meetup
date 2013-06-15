@@ -7,8 +7,8 @@ require_once 'NodeSessionQuery.inc';
 
 function entityfieldquery_menu(){
   return array(
-    'sessions' => array(
-      'title' => t('Sessions'),
+    'my-sessions' => array(
+      'title' => t('My sessions'),
       'page callback' => 'entityfieldquery_list',
       'access arguments' => array('access content'),
     )
@@ -16,21 +16,31 @@ function entityfieldquery_menu(){
 }
 
 /**
- * callback function
+ * callback function for /sessions
  */
 function entityfieldquery_list(){
-  entityfieldquery_list_with_db_select();
-  entityfieldquery_list_normal();
-  entityfieldquery_list_extends();
+  //return entityfieldquery_list_with_db_select();
+  //return entityfieldquery_list_normal();
+  return entityfieldquery_list_extends();
 }
 
+
+/**
+ * Query with basic SelectQuery
+ */
 function entityfieldquery_list_with_db_select(){
   $query = db_select('node', 'n');
   $query->fields('n', array('nid'));
   $query->join('field_data_field_speaker', 's', 's.entity_id = n.nid');
   $query->condition('type', 'session', '=');
+  $query->condition('n.status', 1);
   $query->condition('s.field_speaker_value', 'Jhalak', '=');
+  $query->orderBy('n.nid', 'DESC');
+  $query->orderBy('s.field_speaker_value', 'DESC');
+  $query->range(0, 10);
+  $query->addMetaData('account', user_load(1));
   $result = $query->execute();
+
 
   if ($result->rowCount() <= 0) {
     return t('No entry found.');
@@ -42,23 +52,43 @@ function entityfieldquery_list_with_db_select(){
   return _entityfieldquery_generate_teasure_view($nodes);
 }
 
+
+/**
+ * Query with basic EntityFieldQuery
+ */
 function entityfieldquery_list_normal() {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', array('session'))
-    ->fieldCondition('field_speaker', 'value', 'Jhalak', '=');
+    ->propertyCondition('status', 1)
+    ->fieldCondition('field_speaker', 'value', 'Jhalak', '=')
+    ->entityOrderBy('entity_id', 'DESC')
+    ->fieldOrderBy('field_speaker', 'value', 'DESC')
+    ->range(0, 10)
+    ->addMetaData('account', user_load(1));
+
   $result = $query->execute();
   return _entityfieldquery_generate_output_from_result($result);
 }
 
 
+/**
+ * Query by extending EntityFieldQuery
+ */
 function entityfieldquery_list_extends() {
   $query = new NodeSessionQuery();
-  $query->fieldCondition('field_speaker', 'value', 'Jhalak', '=');
+  $query->fieldCondition('field_speaker', 'value', 'Jhalak', '=')
+    ->entityOrderBy('entity_id', 'DESC')
+    ->fieldOrderBy('field_speaker', 'value', 'DESC');
   $result = $query->execute();
   return _entityfieldquery_generate_output_from_result($result);
 }
 
+
+
+/**
+ * Private utility functions :)
+ */
 function _entityfieldquery_generate_output_from_result($result) {
   if (empty($result['node'])) {
     return t('No entry found.');
